@@ -30,15 +30,6 @@ ControllerNode::ControllerNode(
     using namespace std::literals::chrono_literals; // これが無いと、create_wall_timer等での100msとかの時間単位付きの変数を指定できない
     timer_ = this->create_wall_timer(20ms, std::bind(&ControllerNode::timer_callback, this));
 }
-void ControllerNode::reference_callback(const geometry_msgs::msg::TwistStamped::SharedPtr msg) {
-    //https://www.jstage.jst.go.jp/article/kikaic/77/783/77_783_4125/_article/-char/ja/
-  theta_r_ = msg->pose.pose.linear.x;
-  xr_ = msg->pose.pose.linear.x;
-  yr_ = msg->pose.pose.linear.x;
-  e2_=-sin(theta_r_)*(x_-xr_)+cos(theta_r_)*(y_-yr_);// lateral error
-  e3_=theta_-theta_r_;// heading error
-  curvature_= msg->curvature;
-}
 void ControllerNode::state_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   yawrate_=msg->twist.angular.z;
   velocity_=msg->twist.linar.x;
@@ -46,6 +37,27 @@ void ControllerNode::state_callback(const nav_msgs::msg::Odometry::SharedPtr msg
   y_=msg->pose.pose.linear.y;
   tf2::Quaternion quaternion_temp;
   quaternion_temp.setRPY(0.0,0.0,theta_);
+  counter_=counter_+dt_;
+  // 目標値計算：本来はプランナーモジュール側で計算するが、今回はデモ版なので制御内部で目標値も計算
+  if(counter<5.0)
+  {
+    curvature_=0.0;
+  }
+  else if (counter>15.0 && counter<25.0)
+  {
+    curvature_=0.05;
+  }
+  else if (counter>25.0)
+  {
+    curvature_=0.0;
+    counter_=25.0;
+  }
+  // 誤差計算
+  theta_r_ = theta_r_+curvature_*target_velocity_*dt_;
+  xr_ = xr_+target_velocity_*cos(theta_r_);
+  yr_ = yr_+target_velocity_*sin(theta_r_);
+  e2_=-sin(theta_r_)*(x_-xr_)+cos(theta_r_)*(y_-yr_);// lateral error
+  e3_=theta_-theta_r_;// heading error
 }
 void ControllerNode::timer_callback() {
   yawrate_r_=curvature_*(velocity_*cos(e3_)/(1-e2_*curvature_));
@@ -59,4 +71,10 @@ void ControllerNode::timer_callback() {
   output_msg.header.frame_id = "base_link";
   output_msg.drive.steering_angle = steering_angle_;
   controller_publisher_->publish(output_msg);    
+
+  geometry_msgs::msg:TwistedStamped output_msg;
+  output_msg.header.stamp = this->now();
+  output_msg.header.frame_id = "base_link";
+  output_msg.drive.steering_angle = steering_angle_;
+  controller_publisher_->publish(output_msg); 
 }
