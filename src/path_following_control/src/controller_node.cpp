@@ -22,6 +22,7 @@ ControllerNode::ControllerNode(
     this->declare_parameter("dt", 0.05);        // デフォルト値として0.05を設定
     this->declare_parameter("target_velocity", 5.0);        // デフォルト値として0.05を設定
     this->declare_parameter("wheel_base", 1.0);        // デフォルト値として0.05を設定
+    this->declare_parameter("kff", 1.0);        // デフォルト値として0.05を設定
 
     this->get_parameter("kp",kp_);
     this->get_parameter("ki",ki_);
@@ -30,6 +31,7 @@ ControllerNode::ControllerNode(
     this->get_parameter("dt",dt_);
     this->get_parameter("target_velocity",target_velocity_);
     this->get_parameter("wheel_base",wheel_base_);
+    this->get_parameter("kff", kff_);        // デフォルト値として0.05を設定
 
     controller_subscriber_ = this->create_subscription<nav_msgs::msg::Odometry>("vehicle_state", 1, std::bind(&ControllerNode::state_callback, this, std::placeholders::_1));
 
@@ -61,7 +63,7 @@ void ControllerNode::state_callback(const nav_msgs::msg::Odometry::SharedPtr msg
   {
     curvature_=0.05;
   }
-  else if (counter_>=25.0)
+  else if (theta_r_>=3.14159/2)
   {
     curvature_=0.0;
     counter_=25.0;
@@ -103,8 +105,8 @@ void ControllerNode::timer_callback() {
   // ヨーレート制御
   ew_=yawrate_c_-yawrate_;
   ew_intg_=ew_intg_+ew_*dt_;
-  // steering_angle_=atan2(wheel_base_*yawrate_c_,velocity_)+kp_*ew_+ki_*ew_intg_;    
-  steering_angle_=kp_*ew_+ki_*ew_intg_;    
+  // steering_angle_=atan2(wheel_base_*yawrate_c_,velocity_)+kp_*ew_+ki_*ew_intg_; 
+  steering_angle_=kp_*ew_+ki_*ew_intg_+kff_*yawrate_c_;    
 
   // 操舵角入力計算
   ackermann_msgs::msg::AckermannDriveStamped output_msg;

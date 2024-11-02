@@ -53,4 +53,5 @@ private:
   double ew_;
   double ew_intg_;  
   double wheel_base_;
+  double kff_;
 };

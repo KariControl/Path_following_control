@@ -18,7 +18,8 @@ def generate_launch_description():
         'k3': 0.1,  # k3ゲイン
         'dt': 0.05,  # サンプリング時間
         'target_velocity': 2.0,  # 目標値
-        'wheel_base': 1.0,  # ホイールベース
+        'wheel_base': 2.0,  # ホイールベース
+        'kff': 5.0,  # フィードフォワードゲイン
         }]
     )
     ld.add_action(node)
