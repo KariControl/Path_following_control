@@ -2,7 +2,7 @@
 #include "std_msgs/msg/string.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "ackermann_msgs/msg/ackermann_drive_stamped.hpp"
-#include "sensor_msgs/msg/imu.hpp"
+#include "nav_msgs/msg/odometry.hpp"
 
 class VehiclePlant : public rclcpp::Node
 {
@@ -18,7 +18,7 @@ public:
 private:
   void lateral_callback(const ackermann_msgs::msg::AckermannDriveStamped::SharedPtr msg);
   void Velocity_callback(const geometry_msgs::msg::TwistStamped::SharedPtr msg);
-  rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr yawrate_publisher_;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr vehicle_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr velocity_publisher_;
   rclcpp::Subscription<ackermann_msgs::msg::AckermannDriveStamped>::SharedPtr str_angle_subscriber_;
   rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr velocity_subscriber_;
@@ -32,5 +32,8 @@ private:
   double diff_time_;//差分時間
   double b_coe_;//係数b
   double a_coe_;//係数a
+  double yaw_;
+  double x_;
+  double y_;
 
 };

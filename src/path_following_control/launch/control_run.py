@@ -12,11 +12,13 @@ def generate_launch_description():
         name='path_following',
         output='screen',
         parameters=[{
-        'kp': 0.766527,  # 比例ゲイン 
-        'ki': 0.00,  # 積分ゲイン
-        'kd': 0.728840,  # 微分ゲイン
-        'dt': 0.1,  # サンプリング時間
-        'set_point': 10.0,  # 目標値
+        'kp': 1.2,  # 比例ゲイン 
+        'ki': 3.0,  # 積分ゲイン
+        'k2': 0.6,  # k2ゲイン
+        'k3': 0.1,  # k3ゲイン
+        'dt': 0.05,  # サンプリング時間
+        'target_velocity': 2.0,  # 目標値
+        'wheel_base': 1.0,  # ホイールベース
         }]
     )
     ld.add_action(node)
