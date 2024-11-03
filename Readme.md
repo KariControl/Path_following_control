@@ -1,3 +1,7 @@
+動作確認環境：
+OS:ubuntu 22.04
+、ROS version: ROS2 humble
+
 このqiitaの記事で書いたものをROS2 humbleで実装してみました：
 ※ ヨーレート制御の部分だけ少しだけシンプルにしています。
 https://qiita.com/KariControl/items/78862ae6b45fcfe91126
