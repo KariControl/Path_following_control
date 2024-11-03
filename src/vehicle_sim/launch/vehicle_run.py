@@ -14,7 +14,7 @@ def generate_launch_description():
         parameters=[{
         'a_coe': 0.36,  # 1.0/2.778
         'b_coe': 0.1,  # 0.2778
-        'diff_time': 0.01,  # サンプリング時間
+        'diff_time': 0.05,  # サンプリング時間
         'vehicle_speed': 2.778,  # 初期車速
         'wheel_base': 1.0,  # ホイールベース
         }]
